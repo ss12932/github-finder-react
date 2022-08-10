@@ -12,11 +12,15 @@ function User() {
 
   //no 2nd parameter,  continously run and crash browser. make sure to put empty array
   const params = useParams();
+
+  // TODO: instead of creating functions in context and passing it through provider. refactor in separate actions file and call them from that component and then call our dispatch from the component. reason being, useeffect hook missing dependencies error. 2 external functions being called outside of use effect -> add as dependencies, dont do this because never ending loop. cause browser to crash. passing these fn down as provider, anytime we update our state, these functions are getting recreated so when they get recreated, useeffect fires off because we added as dependency and its going to cet called again and again until browser crashes. dont add as dependency. otherwise easy fix below with eslint disable nxt line.
+
   useEffect(() => {
     // getUser(match.params.login);
     getUser(params.login);
     getUserRepos(params.login);
     //look in state, chrome dev tools, getting user data in the state.
+    //eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const {
     name,
