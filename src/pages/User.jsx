@@ -5,10 +5,10 @@ import { useParams } from 'react-router-dom';
 import Spinner from '../components/layout/Spinner';
 import RepoList from '../components/repos/RepoList';
 import GithubContext from '../context/github/GithubContext';
+import { getUser, getUserRepos } from '../context/github/GithubActions';
 // match prop wont work with react router 6, useparams
 function User() {
-  const { getUser, user, loading, getUserRepos, repos } =
-    useContext(GithubContext);
+  const { user, loading, repos, dispatch } = useContext(GithubContext);
 
   //no 2nd parameter,  continously run and crash browser. make sure to put empty array
   const params = useParams();
@@ -16,12 +16,22 @@ function User() {
   // TODO: instead of creating functions in context and passing it through provider. refactor in separate actions file and call them from that component and then call our dispatch from the component. reason being, useeffect hook missing dependencies error. 2 external functions being called outside of use effect -> add as dependencies, dont do this because never ending loop. cause browser to crash. passing these fn down as provider, anytime we update our state, these functions are getting recreated so when they get recreated, useeffect fires off because we added as dependency and its going to cet called again and again until browser crashes. dont add as dependency. otherwise easy fix below with eslint disable nxt line.
 
   useEffect(() => {
-    // getUser(match.params.login);
-    getUser(params.login);
-    getUserRepos(params.login);
-    //look in state, chrome dev tools, getting user data in the state.
-    //eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    // // getUser(match.params.login);
+    // getUser(params.login);
+    // getUserRepos(params.login);
+    // //look in state, chrome dev tools, getting user data in the state.
+    // //eslint-disable-next-line react-hooks/exhaustive-deps
+    dispatch({ type: 'SET_LOADING' });
+    const getUserData = async () => {
+      const userData = await getUser(params.login);
+      dispatch({ type: 'GET_USER', payload: userData });
+
+      const userRepoData = await getUserRepos(params.login);
+      dispatch({ type: 'GEt_REPOS', payload: userRepoData });
+    };
+    getUserData();
+    // fine to pass these down in deps, since they are not constantly changing like our context functions from before which gets recreated each tiem state changed.
+  }, [dispatch, params.login]);
   const {
     name,
     type,
