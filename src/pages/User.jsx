@@ -5,7 +5,7 @@ import { useParams } from 'react-router-dom';
 import Spinner from '../components/layout/Spinner';
 import RepoList from '../components/repos/RepoList';
 import GithubContext from '../context/github/GithubContext';
-import { getUser, getUserRepos } from '../context/github/GithubActions';
+import { getUserAndRepos } from '../context/github/GithubActions';
 // match prop wont work with react router 6, useparams
 function User() {
   const { user, loading, repos, dispatch } = useContext(GithubContext);
@@ -23,11 +23,8 @@ function User() {
     // //eslint-disable-next-line react-hooks/exhaustive-deps
     dispatch({ type: 'SET_LOADING' });
     const getUserData = async () => {
-      const userData = await getUser(params.login);
-      dispatch({ type: 'GET_USER', payload: userData });
-
-      const userRepoData = await getUserRepos(params.login);
-      dispatch({ type: 'GEt_REPOS', payload: userRepoData });
+      const userData = await getUserAndRepos(params.login);
+      dispatch({ type: 'GET_USER_AND_REPOS', payload: userData });
     };
     getUserData();
     // fine to pass these down in deps, since they are not constantly changing like our context functions from before which gets recreated each tiem state changed.
