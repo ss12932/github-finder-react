@@ -42,8 +42,7 @@ export const GithubProvider = ({ children }) => {
         authorization: `token ${GITHUB_TOKEN}`,
       },
     });
-
-    if ((response.status = 404)) {
+    if (response.status === 404) {
       window.location = '/notfound';
     } else {
       const data = await response.json();
